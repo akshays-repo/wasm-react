@@ -39,14 +39,22 @@ const App = () => {
   }, [])
 
   const handleClickButton = async() => {
-      const n = 1000;
-      console.log("Running wasm.....");
-      const op = await wasmFibonacciSum(n);
-      console.log("wasm op", op);
+      const n = 1000000000;
 
-      console.log("Running js.....");
-      const ops = await jsFibonacciSum(n);
-      console.log("wasm op", ops);
+      console.log("Starting WebAssembly calculation...");
+      const wasmStartTime = performance.now();
+      const wasmResult = await wasmFibonacciSum(n);
+      const wasmEndTime = performance.now();
+      console.log("WebAssembly Result:", wasmResult);
+      console.log(`WebAssembly Calculation Time: ${wasmEndTime - wasmStartTime} milliseconds`);
+
+      // JavaScript
+      console.log("Starting JavaScript calculation...");
+      const jsStartTime = performance.now();
+      const jsResult = jsFibonacciSum(n);
+      const jsEndTime = performance.now();
+      console.log("JavaScript Result:", jsResult);
+      console.log(`JavaScript Calculation Time: ${jsEndTime - jsStartTime} milliseconds`);
   }
 
   return (
