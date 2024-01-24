@@ -1,70 +1,74 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-import "./wasm_exec.js";
-import "./wasmTypes.d.ts";
+import { useEffect, useState } from 'react';
+import './wasm_exec.js';  // Import the wasm_exec.js file for Go-Wasm compatibility
+import './wasmTypes.d.ts';  // Import the TypeScript declarations for WebAssembly
 
-function wasmFibonacciSum(n:number) {
-  return new Promise((resolve) => {
-    const res = window.wasmFibonacciSum(n);
+// Function to wrap the wasmFibonacciSum function for asynchronous handling
+function wasmFibonacciSum(n: number) {
+  return new Promise<number>((resolve) => {
+    // Call the wasmFibonacciSum function from Go
+    const res = window.wasmFibonacciSum(n);  
     resolve(res);
   });
 }
 
-function  jsFibonacciSum(n:number) {
-  let a = 0, b = 1, totalSum = 0;
-
-  for (let i = 0; i < n; i++) {
-    totalSum += a;
-    [a, b] = [b, a + b];
-  }
-
-  return totalSum;
-}
-
 const App = () => {
   const [isWasmLoaded, setIsWasmLoaded] = useState(false);
+  const [wasmResult, setWasmResult] = useState<number | null>(null);
 
+  // useEffect hook to load WebAssembly when the component mounts
   useEffect(() => {
+    // Function to asynchronously load WebAssembly
     async function loadWasm(): Promise<void> {
-      const goWasm = new window.Go();
+      // Create a new Go object
+      const goWasm = new window.Go();  
       const result = await WebAssembly.instantiateStreaming(
-        fetch("main.wasm"),
-        goWasm.importObject
+        // Fetch and instantiate the main.wasm file
+        fetch('main.wasm'),  
+        // Provide the import object to Go for communication with JavaScript
+        goWasm.importObject  
       );
-      goWasm.run(result.instance);
+      // Run the Go program with the WebAssembly instance
+      goWasm.run(result.instance);  
+      setIsWasmLoaded(true); 
     }
-    loadWasm().then(() => {
-      setIsWasmLoaded(true)
-    })
-  }, [])
 
-  const handleClickButton = async() => {
-      const n = 1000000000;
+    loadWasm(); 
+  }, []);  
 
-      console.log("Starting WebAssembly calculation...");
-      const wasmStartTime = performance.now();
-      const wasmResult = await wasmFibonacciSum(n);
-      const wasmEndTime = performance.now();
-      console.log("WebAssembly Result:", wasmResult);
-      console.log(`WebAssembly Calculation Time: ${wasmEndTime - wasmStartTime} milliseconds`);
+  // Function to handle button click and initiate WebAssembly calculation
+  const handleClickButton = async () => {
+    const n = 10;  // Choose a value for n
 
-      // JavaScript
-      console.log("Starting JavaScript calculation...");
-      const jsStartTime = performance.now();
-      const jsResult = jsFibonacciSum(n);
-      const jsEndTime = performance.now();
-      console.log("JavaScript Result:", jsResult);
-      console.log(`JavaScript Calculation Time: ${jsEndTime - jsStartTime} milliseconds`);
-  }
+    console.log('Starting WebAssembly calculation...');
+    const wasmStartTime = performance.now();
 
+    try {
+      // Call the wasmFibonacciSum function asynchronously
+      const result = await wasmFibonacciSum(n);  
+      setWasmResult(result); 
+      console.log('WebAssembly Result:', result);
+    } catch (error) {
+      console.error('WebAssembly Error:', error);
+    }
+
+    const wasmEndTime = performance.now();
+    console.log(`WebAssembly Calculation Time: ${wasmEndTime - wasmStartTime} milliseconds`);
+  };
+
+  // JSX markup for the React component
   return (
     <div>
-      {isWasmLoaded && <p>Wasm Loaded</p>}
-      {!isWasmLoaded && <p>Wasm not Loaded</p>}
+      {isWasmLoaded && <p>Wasm Loaded</p>} 
+      {!isWasmLoaded && <p>Wasm not Loaded</p>} 
 
-      <button onClick={handleClickButton}>Handle Click Wasm</button>
+      <button onClick={handleClickButton}>Handle Click Wasm</button>  
+      {wasmResult !== null && (
+        <div>
+          <p>WebAssembly Result: {wasmResult}</p> 
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;

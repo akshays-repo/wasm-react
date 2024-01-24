@@ -1,30 +1,44 @@
-# React + TypeScript + Vite
+# WebAssembly with Go and React
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repository demonstrates the integration of WebAssembly (Wasm) with Go and React.
 
-Currently, two official plugins are available:
+## How to Run
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Clone the repository:
 
-## Expanding the ESLint configuration
+    ```bash
+    git clone https://github.com/akshays-repo/wasm-react.git
+    cd wasm-react
+    ```
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+2. ### Build Go WebAssembly:
 
-- Configure the top-level `parserOptions` property like this:
+   ```bash
+   GOARCH=wasm GOOS=js go build -o main.wasm
+   ```
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+3. ### Copy `wasm_exec.js`:
+
+   ```bash
+   cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" .
+   ```
+
+4. ### Move the `main.wasm` file to public:
+
+
+5. ### Move the `wasm_exec.js` file to src:
+
+
+6. ### Run the React App:
+
+   ```bash
+   npm install
+   npm start
+   ```
+
+7. Open your browser and visit [http://localhost:5173](http://localhost:5173). You should see the React app with integrated WebAssembly.
+
+Adjust the code and configurations based on your specific requirements. Feel free to explore and modify the code for your needs. Happy coding!
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+This version provides a concise set of instructions on how to run the code without focusing on the installation process.
